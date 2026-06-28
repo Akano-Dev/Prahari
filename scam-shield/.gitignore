@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+build/
+dist/
+
+# Node / dashboard
+node_modules/
+apps/dashboard/dist/
+*.local
+
+# Android
+apps/android/.gradle/
+apps/android/build/
+apps/android/app/build/
+apps/android/local.properties
+*.iml
+.idea/
+
+# Env / secrets
+.env
+infra/.env

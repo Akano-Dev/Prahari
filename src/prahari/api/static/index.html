@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Prahari — Digital-Arrest Scam Checker</title>
+<style>
+  :root {
+    --bg: #0f1220; --card: #1a1f35; --ink: #e9ecf5; --muted: #9aa3bd;
+    --line: #2a3152; --accent: #5b8cff;
+    --safe: #2fbf71; --susp: #e6b800; --high: #ff8c42; --scam: #ff4d5e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.5;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 24px 18px 64px; }
+  header h1 { margin: 0 0 4px; font-size: 1.7rem; }
+  header h1 .glyph { color: var(--accent); }
+  .tagline { color: var(--muted); margin: 0 0 4px; }
+  .mission {
+    font-size: .85rem; color: var(--muted); border-left: 3px solid var(--line);
+    padding: 6px 12px; margin: 14px 0 22px; background: rgba(255,255,255,.02);
+  }
+  textarea {
+    width: 100%; min-height: 130px; resize: vertical; padding: 14px;
+    font-size: 1rem; color: var(--ink); background: var(--card);
+    border: 1px solid var(--line); border-radius: 10px;
+  }
+  textarea:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+  .examples { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 16px; }
+  .examples button, .check {
+    font: inherit; cursor: pointer; border-radius: 8px; border: 1px solid var(--line);
+  }
+  .examples button {
+    background: transparent; color: var(--muted); padding: 6px 11px; font-size: .82rem;
+  }
+  .examples button:hover { color: var(--ink); border-color: var(--accent); }
+  .check {
+    background: var(--accent); color: #fff; border: none; padding: 13px 22px;
+    font-size: 1.02rem; font-weight: 600; width: 100%;
+  }
+  .check:disabled { opacity: .6; cursor: progress; }
+  .privacy { font-size: .78rem; color: var(--muted); margin: 10px 2px 0; text-align: center; }
+
+  #result { margin-top: 26px; display: none; }
+  .verdict {
+    display: flex; align-items: center; gap: 18px; padding: 18px;
+    border-radius: 12px; background: var(--card); border: 1px solid var(--line);
+  }
+  .gauge {
+    flex: 0 0 96px; width: 96px; height: 96px; border-radius: 50%;
+    display: grid; place-items: center; font-size: 1.7rem; font-weight: 700;
+    color: #fff;
+  }
+  .gauge small { display: block; font-size: .6rem; font-weight: 500; opacity: .85; }
+  .vtext h2 { margin: 0 0 2px; font-size: 1.25rem; }
+  .vtext .band { color: var(--muted); margin: 0; }
+  .vtext .scores { color: var(--muted); font-size: .82rem; margin: 6px 0 0; }
+
+  .flags { margin: 18px 0 0; }
+  .flags h3, .safe h3 { font-size: .95rem; margin: 0 0 10px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .04em; }
+  .flag {
+    background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--high);
+    border-radius: 8px; padding: 11px 14px; margin-bottom: 9px;
+  }
+  .flag .ftop { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+  .flag .flabel { font-weight: 600; }
+  .flag .fmatch {
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .8rem;
+    color: var(--scam); background: rgba(255,77,94,.08); padding: 1px 6px; border-radius: 5px;
+  }
+  .flag .fdesc { color: var(--muted); font-size: .86rem; margin: 5px 0 0; }
+  .flag.w1 { border-left-color: var(--susp); }
+  .flag.w2 { border-left-color: var(--high); }
+  .flag.w3 { border-left-color: var(--scam); }
+
+  .safe {
+    margin-top: 20px; background: rgba(47,191,113,.07); border: 1px solid rgba(47,191,113,.35);
+    border-radius: 10px; padding: 16px 18px;
+  }
+  .safe h3 { color: var(--safe); }
+  .safe p { margin: 0; }
+  .safe .helpline { margin-top: 10px; font-weight: 600; }
+  .none { color: var(--muted); }
+  footer { margin-top: 40px; font-size: .76rem; color: var(--muted); text-align: center; }
+  footer a { color: var(--accent); }
+  .err { color: var(--scam); margin-top: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span class="glyph">🛡</span> Prahari</h1>
+    <p class="tagline">Is this message a <strong>"digital arrest"</strong> scam? Paste it and find out.</p>
+  </header>
+
+  <p class="mission">
+    No real police, CBI, ED, RBI or Cyber Crime official ever arrests you over a
+    WhatsApp / video call, or asks you to transfer money to "prove your innocence".
+    Prahari is a <strong>defensive</strong> tool that explains the warning signs.
+    Works in English, Hindi and Hinglish.
+  </p>
+
+  <label for="msg" style="font-weight:600;">Message or call transcript</label>
+  <textarea id="msg" placeholder="e.g. This is CBI. You are under digital arrest. Transfer Rs 50,000 to the safe account and share the OTP immediately…"></textarea>
+
+  <div class="examples" aria-label="Try an example">
+    <button data-ex="scam-en">Example: English scam</button>
+    <button data-ex="scam-hi">Example: Hinglish scam</button>
+    <button data-ex="legit">Example: genuine message</button>
+  </div>
+
+  <button class="check" id="check">Check this message</button>
+  <p class="privacy">Your message is scored on this server only and is not sent to any third party.</p>
+
+  <div id="error" class="err" role="alert"></div>
+
+  <section id="result" aria-live="polite">
+    <div class="verdict">
+      <div class="gauge" id="gauge">–</div>
+      <div class="vtext">
+        <h2 id="verdict">—</h2>
+        <p class="band" id="band"></p>
+        <p class="scores" id="scores"></p>
+      </div>
+    </div>
+
+    <div class="flags" id="flagsBox">
+      <h3>Warning signs detected</h3>
+      <div id="flags"></div>
+    </div>
+
+    <div class="safe" id="safeBox">
+      <h3>What to do</h3>
+      <p id="safe"></p>
+      <p class="helpline">Report at cybercrime.gov.in or call the cyber helpline 1930.</p>
+    </div>
+  </section>
+
+  <footer>
+    Prahari is a defensive, educational fraud-detection tool · not legal advice ·
+    <a href="/docs">API docs</a>
+  </footer>
+</div>
+
+<script>
+const EXAMPLES = {
+  "scam-en": "This is the CBI Cyber Crime Branch. A parcel in your name was seized by customs and contains MDMA. You are under digital arrest. Do not disconnect this call and do not tell anyone. Transfer Rs 1,20,000 to the RBI safe-custody account within 1 hour to prove your innocence, and share the OTP to verify.",
+  "scam-hi": "Inspector Sharma CBI se bol raha hoon. Aapke parcel mein drugs mile hain, aap ab digital arrest mein hain. Phone band mat karo aur kisi ko mat batao. Rs 50,000 safe account mein turant transfer karo aur OTP bhejo, warna giraftari ho jayegi.",
+  "legit": "Hi Anita, running a bit late for dinner. Should reach the restaurant by 8:30. Order the starters if you're hungry!"
+};
+
+const BANDS = [
+  { max: 24, cls: "safe",  color: "#2fbf71" },
+  { max: 49, cls: "susp",  color: "#e6b800" },
+  { max: 74, cls: "high",  color: "#ff8c42" },
+  { max: 100, cls: "scam", color: "#ff4d5e" },
+];
+function bandColor(score){ return (BANDS.find(b => score <= b.max) || BANDS[3]).color; }
+
+const $ = (id) => document.getElementById(id);
+const msg = $("msg");
+
+document.querySelectorAll(".examples button").forEach(btn => {
+  btn.addEventListener("click", () => { msg.value = EXAMPLES[btn.dataset.ex]; msg.focus(); });
+});
+
+$("check").addEventListener("click", check);
+msg.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") check();
+});
+
+async function check() {
+  const text = msg.value.trim();
+  $("error").textContent = "";
+  if (!text) { $("error").textContent = "Please paste a message first."; return; }
+
+  const btn = $("check");
+  btn.disabled = true; btn.textContent = "Checking…";
+  try {
+    const res = await fetch("/score", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ text }),
+    });
+    if (!res.ok) {
+      const detail = (await res.json().catch(() => ({}))).detail;
+      throw new Error(detail || ("Server returned " + res.status));
+    }
+    render(await res.json());
+  } catch (err) {
+    $("error").textContent = "Could not score the message: " + err.message;
+    $("result").style.display = "none";
+  } finally {
+    btn.disabled = false; btn.textContent = "Check this message";
+  }
+}
+
+function render(r) {
+  const color = bandColor(r.score);
+  const g = $("gauge");
+  g.style.background = color;
+  g.innerHTML = r.score + "<small>/ 100</small>";
+
+  $("verdict").textContent = r.is_scam ? "⚠ Likely a scam" : "Looks OK";
+  $("verdict").style.color = r.is_scam ? color : "var(--ink)";
+  $("band").textContent = "Risk band: " + r.band;
+  $("scores").textContent =
+    "AI probability " + (r.ml_probability * 100).toFixed(1) + "%  ·  rule signal " +
+    (r.rule_score * 100).toFixed(0) + "%";
+
+  const flags = $("flags");
+  flags.innerHTML = "";
+  if (r.red_flags.length) {
+    $("flagsBox").style.display = "";
+    r.red_flags.forEach(f => {
+      const el = document.createElement("div");
+      el.className = "flag w" + (f.weight || 1);
+      el.innerHTML =
+        '<div class="ftop"><span class="flabel"></span>' +
+        '<span class="fmatch"></span></div><p class="fdesc"></p>';
+      el.querySelector(".flabel").textContent = f.label;
+      el.querySelector(".fmatch").textContent = "“" + f.match + "”";
+      el.querySelector(".fdesc").textContent = f.description;
+      flags.appendChild(el);
+    });
+  } else {
+    $("flagsBox").style.display = "";
+    flags.innerHTML = '<p class="none">No known scam warning signs were detected. Stay alert anyway.</p>';
+  }
+
+  $("safe").textContent = r.safe_action;
+  $("safeBox").style.display = r.is_scam ? "" : "none";
+
+  $("result").style.display = "block";
+  $("result").scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+</script>
+</body>
+</html>

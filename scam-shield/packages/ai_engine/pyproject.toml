@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scamshield-ai"
+version = "0.1.0"
+description = "ScamShield hybrid scam-detection engine (defensive)."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+  "pydantic>=2.8",
+]
+
+[project.optional-dependencies]
+# Heavy stages are opt-in adapters; the engine runs fully without them.
+nlp = ["spacy>=3.7", "langdetect>=1.0"]
+semantic = ["sentence-transformers>=3.0"]
+llm = ["anthropic>=0.40", "openai>=1.40"]
+dev = ["pytest>=8.3"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["scamshield_ai*"]
+
+[tool.setuptools.package-data]
+"scamshield_ai" = ["knowledge/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

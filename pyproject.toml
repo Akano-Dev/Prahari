@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "prahari"
+version = "0.1.0"
+description = "Prahari — Digital-Arrest Scam Detection & Prevention System (defensive / fraud-detection tool)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Prahari" }]
+dependencies = [
+  "numpy>=1.26",
+  "pandas>=2.2",
+  "scikit-learn>=1.5",
+  "nltk>=3.8",
+  "joblib>=1.4",
+  "matplotlib>=3.9",
+  "seaborn>=0.13",
+  "fastapi>=0.111",
+  "uvicorn>=0.30",
+  "pydantic>=2.8",
+  "requests>=2.32",
+]
+
+[project.optional-dependencies]
+advanced = ["torch>=2.3", "transformers>=4.43", "sentence-transformers>=3.0", "shap>=0.46"]
+dev = ["pytest>=8.3", "jupyter>=1.0", "ipykernel>=6.29"]
+
+[project.scripts]
+prahari = "prahari.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"prahari.api" = ["static/*.html"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

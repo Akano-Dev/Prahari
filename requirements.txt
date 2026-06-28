@@ -1,0 +1,39 @@
+# ---- Prahari pinned dependencies (Python 3.11+) ----
+# Core data / numeric
+numpy==1.26.4
+pandas==2.2.2
+scipy==1.13.1
+
+# Classical ML + NLP
+scikit-learn==1.5.1
+nltk==3.8.1
+joblib==1.4.2
+
+# EDA / plots
+matplotlib==3.9.1
+seaborn==0.13.2
+
+# Notebooks
+jupyter==1.0.0
+ipykernel==6.29.5
+
+# API serving
+fastapi==0.111.1
+uvicorn[standard]==0.30.3
+pydantic==2.8.2
+
+# HTTP client (remote two-machine test client)
+requests==2.32.3
+
+# Testing
+pytest==8.3.2
+
+# ---- Optional / feature-flagged (kept out of the default install) ----
+# Uncomment to enable the advanced DistilBERT model and semantic features:
+# torch==2.3.1
+# transformers==4.43.3
+# sentence-transformers==3.0.1
+# Uncomment for SHAP-based explanations:
+# shap==0.46.0
+# Uncomment for the optional Streamlit demo page:
+# streamlit==1.37.0

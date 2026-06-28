@@ -1,0 +1,52 @@
+# --- Prahari ---
+# Raw Kaggle datasets (user downloads these; never commit)
+data/raw/*
+!data/raw/.gitkeep
+data/interim/*
+!data/interim/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/fixtures/*
+!data/fixtures/.gitkeep
+
+# Saved model artifacts
+models/*
+!models/.gitkeep
+
+# Generated reports (plots/metrics) — keep the folder, ignore contents
+reports/*
+!reports/.gitkeep
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+*.egg
+
+# Virtualenvs
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# Tooling / IDE
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db

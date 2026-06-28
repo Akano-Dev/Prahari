@@ -1,0 +1,53 @@
+{
+  "_note": "Publicly-known operating facts about Indian agencies, used to judge whether a caller's REQUESTS are consistent with a real official. We never assert identity; we flag impossible behaviour.",
+  "universal_red_lines": [
+    "No agency conducts arrests or interrogations over a WhatsApp/Skype/video call.",
+    "No agency asks you to transfer money to a 'safe', 'RBI verification' or 'secure government' account.",
+    "No official asks for an OTP, CVV, PIN, full card number or your banking password.",
+    "No official asks you to keep a legal case secret from your family.",
+    "Genuine legal notices arrive in writing/physical summons, not as a phone demand for immediate payment.",
+    "'Digital arrest' is not a real legal procedure in India."
+  ],
+  "agencies": {
+    "cbi": {
+      "label": "Central Bureau of Investigation",
+      "facts": [
+        "Investigates notified offences; does not cold-call citizens to demand money.",
+        "Does not place people under 'digital arrest' or collect fines via UPI/RTGS."
+      ]
+    },
+    "ed": {
+      "label": "Enforcement Directorate",
+      "facts": [
+        "Handles money-laundering/FEMA matters via formal summons under PMLA.",
+        "Never settles a case by an instant bank transfer over a call."
+      ]
+    },
+    "rbi": {
+      "label": "Reserve Bank of India",
+      "facts": [
+        "Is a regulator; does not hold personal 'verification' accounts for citizens.",
+        "Never calls individuals to move their money for 'safety'."
+      ]
+    },
+    "police": {
+      "label": "State Police / Cyber Cell",
+      "facts": [
+        "Does not arrest or interrogate over a video call.",
+        "Does not demand fines or 'security deposits' to a private/UPI account."
+      ]
+    },
+    "trai": {
+      "label": "Telecom Regulatory Authority of India",
+      "facts": [
+        "Does not block individual SIMs by phone or take payments to 'reactivate' them."
+      ]
+    },
+    "customs": {
+      "label": "Customs Department",
+      "facts": [
+        "Does not phone individuals to collect 'clearance fees' for a seized parcel to a personal account."
+      ]
+    }
+  }
+}

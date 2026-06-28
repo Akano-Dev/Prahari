@@ -1,0 +1,18 @@
+{
+  "_note": "Canonical scam-tactic exemplars. The semantic_similarity stage compares utterances against these; the knowledge_base stage surfaces the matched advisory. Replace the bag-of-words fallback with real sentence-embeddings in production.",
+  "exemplars": [
+    {"category": "digital_arrest", "text": "you are under digital arrest stay on the video call do not disconnect", "advisory": "Digital arrest is fake; hang up immediately."},
+    {"category": "digital_arrest", "text": "aap digital arrest mein hain phone band mat karo kisi ko mat batao", "advisory": "No agency arrests over a call; disconnect and report."},
+    {"category": "parcel_scam", "text": "a parcel in your name was seized by customs it contains drugs", "advisory": "Courier 'seized parcel' calls are a scam entry point."},
+    {"category": "money_demand", "text": "transfer the money to the rbi safe account to prove your innocence", "advisory": "No one needs your money to prove innocence."},
+    {"category": "credential_request", "text": "share the otp and your cvv for verification", "advisory": "Never share OTP/CVV; officials never ask."},
+    {"category": "kyc_scam", "text": "your kyc is incomplete your account will be suspended update now", "advisory": "Banks don't suspend accounts via SMS links."},
+    {"category": "tech_support_scam", "text": "your computer is infected install anydesk so we can fix it", "advisory": "Never install remote-access apps for cold callers."},
+    {"category": "upi_scam", "text": "approve the collect request to receive your refund", "advisory": "Approving a collect request sends money, not receives it."},
+    {"category": "sextortion", "text": "we recorded your video it will be leaked unless you pay", "advisory": "Do not pay; report sextortion to 1930."},
+    {"category": "lottery_scam", "text": "congratulations you won the kbc lottery pay the processing fee to claim", "advisory": "Lotteries you never entered are always fake."},
+    {"category": "investment_scam", "text": "guaranteed high returns double your money join the trading group", "advisory": "Guaranteed returns are a hallmark of investment fraud."},
+    {"category": "loan_scam", "text": "your loan is pre approved just pay the processing fee first", "advisory": "Legit lenders deduct fees from disbursal, not upfront."},
+    {"category": "job_scam", "text": "work from home part time job pay a small registration fee to start", "advisory": "Real jobs don't charge you to start."}
+  ]
+}
