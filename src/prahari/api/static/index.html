@@ -6,143 +6,277 @@
 <title>Prahari — Digital-Arrest Scam Checker</title>
 <style>
   :root {
-    --bg: #0f1220; --card: #1a1f35; --ink: #e9ecf5; --muted: #9aa3bd;
-    --line: #2a3152; --accent: #5b8cff;
-    --safe: #2fbf71; --susp: #e6b800; --high: #ff8c42; --scam: #ff4d5e;
+    /* elevation scale: page -> sunken input -> raised card -> verdict card */
+    --bg: #0e1220;
+    --sunken: #12172a;
+    --surface: #1a2038;
+    --surface-2: #1c2340;
+    --ink: #eaedf6;
+    --muted: #aab3cc;          /* AA-contrast on --bg (~5:1) */
+    --line: #2a3152;
+    --accent: #5b8cff;
+    --safe: #2fbf71; --susp: #e6b800; --high: #ff8c42; --scam: #f5586a;
+    --radius-lg: 16px; --radius-md: 12px;
+    --shadow: 0 8px 40px rgba(0,0,0,.45);
   }
   * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
   body {
-    margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg); color: var(--ink); line-height: 1.5;
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink); line-height: 1.5;
+    background:
+      radial-gradient(1200px 620px at 50% -12%, #171d33 0%, rgba(23,29,51,0) 58%),
+      var(--bg);
+    background-attachment: fixed;
+    min-height: 100vh;
   }
-  .wrap { max-width: 760px; margin: 0 auto; padding: 24px 18px 64px; }
-  header h1 { margin: 0 0 4px; font-size: 1.7rem; }
-  header h1 .glyph { color: var(--accent); }
-  .tagline { color: var(--muted); margin: 0 0 4px; }
-  .mission {
-    font-size: .85rem; color: var(--muted); border-left: 3px solid var(--line);
-    padding: 6px 12px; margin: 14px 0 22px; background: rgba(255,255,255,.02);
-  }
-  textarea {
-    width: 100%; min-height: 130px; resize: vertical; padding: 14px;
-    font-size: 1rem; color: var(--ink); background: var(--card);
-    border: 1px solid var(--line); border-radius: 10px;
-  }
-  textarea:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
-  .examples { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 16px; }
-  .examples button, .check {
-    font: inherit; cursor: pointer; border-radius: 8px; border: 1px solid var(--line);
-  }
-  .examples button {
-    background: transparent; color: var(--muted); padding: 6px 11px; font-size: .82rem;
-  }
-  .examples button:hover { color: var(--ink); border-color: var(--accent); }
-  .check {
-    background: var(--accent); color: #fff; border: none; padding: 13px 22px;
-    font-size: 1.02rem; font-weight: 600; width: 100%;
-  }
-  .check:disabled { opacity: .6; cursor: progress; }
-  .privacy { font-size: .78rem; color: var(--muted); margin: 10px 2px 0; text-align: center; }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 32px 20px 72px; }
 
-  #result { margin-top: 26px; display: none; }
+  /* ---------- header ---------- */
+  header { text-align: center; margin-bottom: 24px; }
+  .badge {
+    display: inline-grid; place-items: center; width: 56px; height: 56px;
+    margin-bottom: 12px; border-radius: 18px; font-size: 1.7rem;
+    background: linear-gradient(180deg, rgba(91,140,255,.22), rgba(91,140,255,.06));
+    border: 1px solid rgba(91,140,255,.35);
+    box-shadow: 0 6px 24px rgba(91,140,255,.22);
+  }
+  header h1 { margin: 0 0 6px; font-size: 2rem; letter-spacing: -.01em; }
+  header h1 .glyph { color: var(--accent); }
+  .tagline { color: var(--muted); margin: 0 auto; max-width: 52ch; }
+  .tagline strong { color: var(--ink); }
+
+  /* ---------- console card (the focal point) ---------- */
+  .console {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-top: 8px;
+  }
+  .field-label { display: block; font-weight: 600; margin: 0 0 8px; font-size: .95rem; }
+  textarea {
+    width: 100%; min-height: 160px; resize: vertical; padding: 16px;
+    font-size: 1.05rem; line-height: 1.6; color: var(--ink);
+    background: var(--sunken);
+    border: 1px solid var(--line); border-radius: var(--radius-md);
+    transition: border-color .15s, box-shadow .15s;
+  }
+  textarea::placeholder { color: #7c85a3; }
+  textarea:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(91,140,255,.16);
+  }
+
+  /* ---------- example pills ---------- */
+  .examples { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 16px 0 20px; }
+  .examples .try { color: var(--muted); font-size: .82rem; margin-right: 2px; }
+  .examples button {
+    font: inherit; cursor: pointer; font-size: .84rem; padding: 8px 15px;
+    border-radius: 999px; border: 1px solid var(--line);
+    background: rgba(255,255,255,.03); color: var(--muted);
+    transition: transform .12s, background .15s, border-color .15s, color .15s;
+  }
+  .examples button:hover { transform: translateY(-1px); }
+  .examples button[data-ex^="scam"] {
+    color: #ff9aa4; border-color: rgba(245,88,106,.35); background: rgba(245,88,106,.09);
+  }
+  .examples button[data-ex^="scam"]:hover { background: rgba(245,88,106,.16); }
+  .examples button[data-ex="legit"] {
+    color: #7fe0a6; border-color: rgba(47,191,113,.35); background: rgba(47,191,113,.09);
+  }
+  .examples button[data-ex="legit"]:hover { background: rgba(47,191,113,.16); }
+
+  /* ---------- primary CTA ---------- */
+  .check {
+    position: relative; font: inherit; cursor: pointer; width: 100%;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 15px 22px; font-size: 1.06rem; font-weight: 650; color: #fff;
+    border: none; border-radius: var(--radius-md);
+    background: linear-gradient(180deg, #6b98ff, #4d7dff);
+    box-shadow: 0 6px 20px rgba(91,140,255,.38);
+    transition: transform .12s, box-shadow .15s, filter .15s;
+  }
+  .check:hover { filter: brightness(1.05); box-shadow: 0 8px 26px rgba(91,140,255,.5); }
+  .check:active { transform: translateY(1px); }
+  .check:disabled { opacity: .7; cursor: progress; box-shadow: none; }
+  .check kbd {
+    position: absolute; right: 16px; font-size: .72rem; font-weight: 600;
+    padding: 2px 7px; border-radius: 6px; color: #dfe7ff;
+    background: rgba(255,255,255,.16);
+  }
+  @media (max-width: 460px) { .check kbd { display: none; } }
+  .spin {
+    width: 15px; height: 15px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,.4); border-top-color: #fff;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .privacy {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    font-size: .8rem; color: var(--muted); margin: 14px 2px 0; text-align: center;
+  }
+
+  /* ---------- mission (demoted, below the fold of the input) ---------- */
+  .mission {
+    max-width: 62ch; margin: 22px auto 0; font-size: .86rem; color: var(--muted);
+    border-left: 3px solid rgba(91,140,255,.4); padding: 8px 14px;
+    background: rgba(255,255,255,.02); border-radius: 0 8px 8px 0;
+  }
+  .mission strong { color: var(--ink); }
+
+  /* ---------- result ---------- */
+  #result { margin-top: 28px; display: none; }
+  #result.show { display: block; animation: rise .28s ease both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
   .verdict {
-    display: flex; align-items: center; gap: 18px; padding: 18px;
-    border-radius: 12px; background: var(--card); border: 1px solid var(--line);
+    display: flex; align-items: center; gap: 20px; padding: 22px;
+    border-radius: var(--radius-lg); background: var(--surface-2);
+    border: 1px solid var(--line);
   }
   .gauge {
-    flex: 0 0 96px; width: 96px; height: 96px; border-radius: 50%;
-    display: grid; place-items: center; font-size: 1.7rem; font-weight: 700;
-    color: #fff;
+    position: relative; flex: 0 0 104px; width: 104px; height: 104px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: conic-gradient(var(--c, var(--accent)) calc(var(--pct, 0) * 1%), rgba(255,255,255,.07) 0);
   }
-  .gauge small { display: block; font-size: .6rem; font-weight: 500; opacity: .85; }
-  .vtext h2 { margin: 0 0 2px; font-size: 1.25rem; }
-  .vtext .band { color: var(--muted); margin: 0; }
-  .vtext .scores { color: var(--muted); font-size: .82rem; margin: 6px 0 0; }
+  .gauge::before {
+    content: ""; position: absolute; inset: 9px; border-radius: 50%;
+    background: var(--surface-2);
+  }
+  .gval { position: relative; z-index: 1; font-size: 1.8rem; font-weight: 700; color: var(--ink); }
+  .gval small { display: block; font-size: .58rem; font-weight: 500; color: var(--muted); }
+  .vtext h2 { margin: 0 0 4px; font-size: 1.3rem; }
+  .vtext .reassure { margin: 0 0 8px; color: var(--ink); font-size: .95rem; }
+  .vtext .band { color: var(--muted); margin: 0; font-weight: 600; }
+  .vtext .scores { color: var(--muted); font-size: .8rem; margin: 8px 0 0; }
 
-  .flags { margin: 18px 0 0; }
-  .flags h3, .safe h3 { font-size: .95rem; margin: 0 0 10px; color: var(--muted);
-    text-transform: uppercase; letter-spacing: .04em; }
+  /* ---------- action panel (the hero when it's a scam) ---------- */
+  .safe {
+    margin-top: 16px; background: linear-gradient(180deg, rgba(47,191,113,.1), rgba(47,191,113,.04));
+    border: 1px solid rgba(47,191,113,.4); border-radius: var(--radius-lg); padding: 22px 24px;
+  }
+  .safe h3 {
+    margin: 0 0 14px; font-size: 1.05rem; color: var(--safe);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .steps { margin: 0 0 18px; padding: 0; list-style: none; counter-reset: s; }
+  .steps li {
+    position: relative; padding: 4px 0 4px 40px; margin-bottom: 8px;
+    font-size: .98rem; counter-increment: s;
+  }
+  .steps li::before {
+    content: counter(s); position: absolute; left: 0; top: 2px;
+    width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+    font-size: .82rem; font-weight: 700; color: var(--safe);
+    background: rgba(47,191,113,.15); border: 1px solid rgba(47,191,113,.4);
+  }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px; }
+  .actions a {
+    display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+    padding: 12px 20px; border-radius: var(--radius-md); font-weight: 650; font-size: 1rem;
+  }
+  .actions .call { background: var(--safe); color: #06210f; box-shadow: 0 6px 18px rgba(47,191,113,.3); }
+  .actions .call:hover { filter: brightness(1.06); }
+  .actions .report { background: rgba(255,255,255,.05); color: var(--ink); border: 1px solid var(--line); }
+  .actions .report:hover { border-color: var(--muted); }
+  .safe .detail { margin: 16px 0 0; padding-top: 14px; border-top: 1px solid rgba(47,191,113,.22);
+    color: var(--muted); font-size: .88rem; }
+
+  /* ---------- flags ---------- */
+  .flags { margin: 16px 0 0; }
+  .flags h3 { font-size: .8rem; margin: 0 0 12px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .06em; }
   .flag {
-    background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--high);
-    border-radius: 8px; padding: 11px 14px; margin-bottom: 9px;
+    background: var(--surface-2); border: 1px solid var(--line); border-left: 4px solid var(--high);
+    border-radius: var(--radius-md); padding: 13px 16px; margin-bottom: 10px;
   }
   .flag .ftop { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
-  .flag .flabel { font-weight: 600; }
+  .flag .flabel { font-weight: 650; }
   .flag .fmatch {
     font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .8rem;
-    color: var(--scam); background: rgba(255,77,94,.08); padding: 1px 6px; border-radius: 5px;
+    color: #ff9aa4; background: rgba(245,88,106,.1); padding: 2px 7px; border-radius: 6px; white-space: nowrap;
   }
-  .flag .fdesc { color: var(--muted); font-size: .86rem; margin: 5px 0 0; }
+  .flag .fdesc { color: var(--muted); font-size: .87rem; margin: 6px 0 0; max-width: 62ch; }
   .flag.w1 { border-left-color: var(--susp); }
   .flag.w2 { border-left-color: var(--high); }
   .flag.w3 { border-left-color: var(--scam); }
-
-  .safe {
-    margin-top: 20px; background: rgba(47,191,113,.07); border: 1px solid rgba(47,191,113,.35);
-    border-radius: 10px; padding: 16px 18px;
-  }
-  .safe h3 { color: var(--safe); }
-  .safe p { margin: 0; }
-  .safe .helpline { margin-top: 10px; font-weight: 600; }
   .none { color: var(--muted); }
-  footer { margin-top: 40px; font-size: .76rem; color: var(--muted); text-align: center; }
+
+  footer { max-width: 62ch; margin: 44px auto 0; font-size: .78rem; color: var(--muted); text-align: center; }
   footer a { color: var(--accent); }
-  .err { color: var(--scam); margin-top: 14px; }
+  .err { color: var(--scam); margin-top: 16px; text-align: center; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1><span class="glyph">🛡</span> Prahari</h1>
-    <p class="tagline">Is this message a <strong>"digital arrest"</strong> scam? Paste it and find out.</p>
+    <div class="badge">🛡</div>
+    <h1><span class="glyph">Prahari</span></h1>
+    <p class="tagline">Is this message a <strong>"digital arrest"</strong> scam? Paste it below and find out — in English, Hindi or Hinglish.</p>
   </header>
+
+  <main class="console">
+    <label class="field-label" for="msg">Message or call transcript</label>
+    <textarea id="msg" placeholder="e.g. This is CBI. You are under digital arrest. Transfer Rs 50,000 to the safe account and share the OTP immediately…"></textarea>
+
+    <div class="examples" aria-label="Try an example">
+      <span class="try">Try:</span>
+      <button data-ex="scam-en">English scam</button>
+      <button data-ex="scam-hi">Hinglish scam</button>
+      <button data-ex="legit">Genuine message</button>
+    </div>
+
+    <button class="check" id="check"><span class="cta-label">🛡 Check this message</span><kbd>⌘↵</kbd></button>
+    <p class="privacy"><span aria-hidden="true">🔒</span> Scored on this server only — never sent to any third party.</p>
+  </main>
 
   <p class="mission">
     No real police, CBI, ED, RBI or Cyber Crime official ever arrests you over a
     WhatsApp / video call, or asks you to transfer money to "prove your innocence".
     Prahari is a <strong>defensive</strong> tool that explains the warning signs.
-    Works in English, Hindi and Hinglish.
   </p>
-
-  <label for="msg" style="font-weight:600;">Message or call transcript</label>
-  <textarea id="msg" placeholder="e.g. This is CBI. You are under digital arrest. Transfer Rs 50,000 to the safe account and share the OTP immediately…"></textarea>
-
-  <div class="examples" aria-label="Try an example">
-    <button data-ex="scam-en">Example: English scam</button>
-    <button data-ex="scam-hi">Example: Hinglish scam</button>
-    <button data-ex="legit">Example: genuine message</button>
-  </div>
-
-  <button class="check" id="check">Check this message</button>
-  <p class="privacy">Your message is scored on this server only and is not sent to any third party.</p>
 
   <div id="error" class="err" role="alert"></div>
 
   <section id="result" aria-live="polite">
     <div class="verdict">
-      <div class="gauge" id="gauge">–</div>
+      <div class="gauge" id="gauge"><span class="gval">–</span></div>
       <div class="vtext">
         <h2 id="verdict">—</h2>
+        <p class="reassure" id="reassure"></p>
         <p class="band" id="band"></p>
         <p class="scores" id="scores"></p>
       </div>
+    </div>
+
+    <div class="safe" id="safeBox">
+      <h3><span aria-hidden="true">✅</span> What to do right now</h3>
+      <ol class="steps">
+        <li>Hang up or stop replying — you can end this call at any time.</li>
+        <li>Do <strong>not</strong> share any OTP, PIN or card details, and do <strong>not</strong> transfer money.</li>
+        <li>You have done nothing wrong. No real agency arrests anyone over a call.</li>
+        <li>Report it — the sooner the better.</li>
+      </ol>
+      <div class="actions">
+        <a class="call" href="tel:1930"><span aria-hidden="true">📞</span> Call 1930</a>
+        <a class="report" href="https://cybercrime.gov.in" target="_blank" rel="noopener">Report at cybercrime.gov.in ↗</a>
+      </div>
+      <p class="detail" id="safe"></p>
     </div>
 
     <div class="flags" id="flagsBox">
       <h3>Warning signs detected</h3>
       <div id="flags"></div>
     </div>
-
-    <div class="safe" id="safeBox">
-      <h3>What to do</h3>
-      <p id="safe"></p>
-      <p class="helpline">Report at cybercrime.gov.in or call the cyber helpline 1930.</p>
-    </div>
   </section>
 
   <footer>
     Prahari is a defensive, educational fraud-detection tool · not legal advice ·
-    <a href="/docs">API docs</a>
+    aligned with cybercrime.gov.in guidance · <a href="/docs">API docs</a>
   </footer>
 </div>
 
@@ -157,9 +291,11 @@ const BANDS = [
   { max: 24, cls: "safe",  color: "#2fbf71" },
   { max: 49, cls: "susp",  color: "#e6b800" },
   { max: 74, cls: "high",  color: "#ff8c42" },
-  { max: 100, cls: "scam", color: "#ff4d5e" },
+  { max: 100, cls: "scam", color: "#f5586a" },
 ];
 function bandColor(score){ return (BANDS.find(b => score <= b.max) || BANDS[3]).color; }
+
+const CTA_LABEL = '<span class="cta-label">🛡 Check this message</span><kbd>⌘↵</kbd>';
 
 const $ = (id) => document.getElementById(id);
 const msg = $("msg");
@@ -179,7 +315,7 @@ async function check() {
   if (!text) { $("error").textContent = "Please paste a message first."; return; }
 
   const btn = $("check");
-  btn.disabled = true; btn.textContent = "Checking…";
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Checking…';
   try {
     const res = await fetch("/score", {
       method: "POST",
@@ -193,20 +329,28 @@ async function check() {
     render(await res.json());
   } catch (err) {
     $("error").textContent = "Could not score the message: " + err.message;
-    $("result").style.display = "none";
+    $("result").classList.remove("show");
   } finally {
-    btn.disabled = false; btn.textContent = "Check this message";
+    btn.disabled = false; btn.innerHTML = CTA_LABEL;
   }
 }
 
 function render(r) {
   const color = bandColor(r.score);
   const g = $("gauge");
-  g.style.background = color;
-  g.innerHTML = r.score + "<small>/ 100</small>";
+  g.style.setProperty("--pct", r.score);
+  g.style.setProperty("--c", color);
+  g.innerHTML = '<span class="gval">' + r.score + '<small>/ 100</small></span>';
 
-  $("verdict").textContent = r.is_scam ? "⚠ Likely a scam" : "Looks OK";
-  $("verdict").style.color = r.is_scam ? color : "var(--ink)";
+  if (r.is_scam) {
+    $("verdict").textContent = "⚠ This looks like a scam";
+    $("verdict").style.color = color;
+    $("reassure").textContent = "Take a breath — you're safe. Nothing bad happens by hanging up. Follow the steps below.";
+  } else {
+    $("verdict").textContent = "✅ No scam signs detected";
+    $("verdict").style.color = "var(--ink)";
+    $("reassure").textContent = "This message doesn't show the usual digital-arrest scam signs. Stay alert anyway.";
+  }
   $("band").textContent = "Risk band: " + r.band;
   $("scores").textContent =
     "AI probability " + (r.ml_probability * 100).toFixed(1) + "%  ·  rule signal " +
@@ -214,8 +358,8 @@ function render(r) {
 
   const flags = $("flags");
   flags.innerHTML = "";
+  $("flagsBox").style.display = "";
   if (r.red_flags.length) {
-    $("flagsBox").style.display = "";
     r.red_flags.forEach(f => {
       const el = document.createElement("div");
       el.className = "flag w" + (f.weight || 1);
@@ -228,14 +372,13 @@ function render(r) {
       flags.appendChild(el);
     });
   } else {
-    $("flagsBox").style.display = "";
     flags.innerHTML = '<p class="none">No known scam warning signs were detected. Stay alert anyway.</p>';
   }
 
   $("safe").textContent = r.safe_action;
   $("safeBox").style.display = r.is_scam ? "" : "none";
 
-  $("result").style.display = "block";
+  $("result").classList.add("show");
   $("result").scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 </script>

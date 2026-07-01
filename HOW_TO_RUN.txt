@@ -1,0 +1,124 @@
+PRAHARI — HOW TO RUN
+====================
+
+This repository holds TWO runnable apps:
+
+  1. Prahari      — the original Python CLI + FastAPI web UI   (repo root, src/prahari/)
+  2. ScamShield   — a newer 4-component rebuild                (scam-shield/)
+
+Platform note: commands below are for Windows PowerShell. The project virtual
+environment already exists at .venv (Python 3.11.3) with dependencies installed,
+and a trained model is already present at models/prahari_model.joblib — so you
+can skip straight to "Run" for app #1.
+
+
+====================================================================
+APP 1 — PRAHARI (CLI + web UI)   [recommended starting point]
+====================================================================
+
+Location: C:\Users\rimso\Desktop\Projects\Prahari
+
+--- One-time setup (already done on this machine; here for reference) ---
+    python -m venv .venv
+    .venv\Scripts\Activate.ps1          # activate the venv (PowerShell)
+    pip install -e .                    # runtime deps from pyproject.toml
+    pip install pytest httpx            # only needed to run the tests
+
+--- Activate the environment ---
+    .venv\Scripts\Activate.ps1
+    # (If PowerShell blocks activation, either run the python.exe directly as
+    #  shown below, or allow scripts once:
+    #  Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass)
+
+--- Run (pipeline is already trained, so just predict or serve) ---
+
+  Score one message from the command line:
+    prahari predict "You are under digital arrest, share the OTP now"
+
+  Launch the web UI + API:
+    prahari serve
+    # then open:  http://127.0.0.1:8000/app     (paste-a-message web UI)
+    #             http://127.0.0.1:8000/docs     (interactive API docs)
+
+  If "prahari" is not found on PATH, call it through the venv python:
+    .venv\Scripts\python.exe -m prahari.cli predict "share the OTP now"
+    .venv\Scripts\python.exe -m prahari.cli serve
+
+--- Rebuild the model from scratch (optional) ---
+    prahari augment      # build a dataset (synthetic-only if data/raw is empty)
+    prahari train        # -> models/prahari_model.joblib
+    prahari evaluate     # -> reports/metrics.json, confusion_matrix.png, roc_curve.png
+    prahari predict "CBI: transfer Rs 50000 to a safe account and share the OTP"
+    prahari serve
+
+  (Demo works with NO Kaggle download — it falls back to a synthetic-only
+   corpus. For a real model, drop the 3 Kaggle CSVs into data/raw/ first, then
+   re-run "prahari augment".)
+
+--- HTTP API example ---
+    POST http://127.0.0.1:8000/score
+    body: {"text": "You are under digital arrest, share the OTP now"}
+    Routes:  /app (web UI)  /score (POST)  /health (GET)  /docs (OpenAPI)
+
+--- Run the tests (36 tests) ---
+    .venv\Scripts\python.exe -m pytest
+    # httpx + pytest must be installed (see setup above)
+
+
+====================================================================
+APP 2 — SCAMSHIELD (FastAPI backend + React dashboard)
+====================================================================
+
+Location: C:\Users\rimso\Desktop\Projects\Prahari\scam-shield
+This is a separate monorepo (AI engine + API + web dashboard + Android app).
+It needs its own dependencies installed into a Python environment.
+
+--- Backend (engine + API), runs locally with no Postgres/Redis ---
+    cd scam-shield\services\api
+    python -m pip install -e ..\..\packages\ai_engine -e .
+    uvicorn app.main:app --reload
+    # -> http://127.0.0.1:8000/docs
+    # Boots with an in-memory repo + broker out of the box.
+    # Set DATABASE_URL / REDIS_URL to switch to Postgres/Redis.
+
+--- Backend tests ---
+    # from scam-shield/ root:
+    pytest packages\ai_engine services\api
+
+--- Web dashboard (React + Vite) ---
+    cd scam-shield\apps\dashboard
+    npm install
+    # point it at the backend and start the dev server:
+    #   PowerShell:  $env:VITE_API_BASE="http://localhost:8000"; npx vite
+    # Use the "Simulate incoming scam call" button to drive the whole pipeline.
+
+--- Optional: real Claude reasoning (off by default; never decides the verdict) ---
+    pip install -e "packages/ai_engine[llm]"        # installs the anthropic SDK
+    # PowerShell:
+    $env:SCAMSHIELD_LLM_PROVIDER = "claude"
+    $env:ANTHROPIC_API_KEY = "sk-ant-..."           # required, else stays on stub
+    $env:SCAMSHIELD_LLM_MODEL = "claude-opus-4-8"   # optional (default)
+    uvicorn app.main:app
+    # GET /health then reports "llm_provider": "claude". Any error/refusal/missing
+    # key falls back to the deterministic explanation, so it always boots.
+
+--- Android app ---
+    apps/android is a Kotlin scaffold (open in Android Studio; not built here).
+
+
+====================================================================
+WHAT THIS PROJECT IS
+====================================================================
+Prahari ("sentinel/guard") is a DEFENSIVE detector for the Indian "digital
+arrest" scam — fraudsters impersonating police/CBI/ED/RBI over video calls to
+coerce money transfers. It fuses an explainable red-flag rule engine with a
+TF-IDF + LogisticRegression model:
+
+    final score = 100 x (0.65 * ml_probability + 0.35 * rule_score)
+
+It detects the same tactics in English, romanized Hindi (Hinglish), and
+Devanagari Hindi, and always explains WHICH red flags fired and the safe action.
+
+If you actually receive such a call: hang up, share no OTP/bank details, and
+report at https://cybercrime.gov.in or call 1930. No real agency arrests anyone
+over WhatsApp/video or asks for money to "prove innocence".
